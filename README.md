@@ -322,7 +322,7 @@ kubectl get kubearmor-policies -n wisecow -o yaml
 
 For detailed deployment instructions, see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
-## 📞 Support
+## 📞 Contact - fk3205545@gmail.com
 
 For issues and questions:
 - Check the troubleshooting section above
