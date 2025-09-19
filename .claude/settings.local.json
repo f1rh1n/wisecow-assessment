@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(docker:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(code .)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

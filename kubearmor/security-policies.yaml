@@ -1,0 +1,290 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-security-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+  process:
+    matchPaths:
+    - path: /bin/bash
+      action: Allow
+    - path: /usr/bin/fortune
+      action: Allow
+    - path: /usr/games/cowsay
+      action: Allow
+    - path: /bin/nc
+      action: Allow
+    - path: /usr/bin/nc
+      action: Allow
+    - path: /app/wisecow.sh
+      action: Allow
+    matchDirectories:
+    - dir: /usr/share/games/fortunes/
+      recursive: true
+      action: Allow
+    - dir: /usr/share/cowsay/
+      recursive: true
+      action: Allow
+    - dir: /tmp/
+      recursive: true
+      action: Allow
+    - dir: /var/tmp/
+      recursive: true
+      action: Allow
+    - dir: /proc/
+      recursive: true
+      action: Allow
+    - dir: /sys/
+      recursive: true
+      action: Allow
+    action: Block
+  file:
+    matchPaths:
+    - path: /app/wisecow.sh
+      action: Allow
+    - path: /etc/passwd
+      action: Allow
+    - path: /etc/group
+      action: Allow
+    - path: /etc/resolv.conf
+      action: Allow
+    - path: /etc/hosts
+      action: Allow
+    - path: /etc/hostname
+      action: Allow
+    - path: /etc/nsswitch.conf
+      action: Allow
+    matchDirectories:
+    - dir: /usr/share/games/fortunes/
+      recursive: true
+      action: Allow
+    - dir: /usr/share/cowsay/
+      recursive: true
+      action: Allow
+    - dir: /lib/
+      recursive: true
+      action: Allow
+    - dir: /lib64/
+      recursive: true
+      action: Allow
+    - dir: /usr/lib/
+      recursive: true
+      action: Allow
+    - dir: /bin/
+      recursive: true
+      action: Allow
+    - dir: /usr/bin/
+      recursive: true
+      action: Allow
+    - dir: /usr/games/
+      recursive: true
+      action: Allow
+    - dir: /tmp/
+      recursive: true
+      action: Allow
+    - dir: /var/tmp/
+      recursive: true
+      action: Allow
+    - dir: /proc/
+      recursive: true
+      action: Allow
+    - dir: /sys/
+      recursive: true
+      action: Allow
+    - dir: /dev/
+      recursive: true
+      action: Allow
+    action: Block
+  network:
+    matchProtocols:
+    - protocol: tcp
+      action: Allow
+    - protocol: udp
+      action: Allow
+    - protocol: icmp
+      action: Allow
+    action: Block
+  capabilities:
+    matchCapabilities:
+    - capability: NET_BIND_SERVICE
+      action: Allow
+    action: Block
+  syscalls:
+    matchSyscalls:
+    - syscall: accept
+      action: Allow
+    - syscall: accept4
+      action: Allow
+    - syscall: bind
+      action: Allow
+    - syscall: connect
+      action: Allow
+    - syscall: listen
+      action: Allow
+    - syscall: socket
+      action: Allow
+    - syscall: read
+      action: Allow
+    - syscall: write
+      action: Allow
+    - syscall: open
+      action: Allow
+    - syscall: openat
+      action: Allow
+    - syscall: close
+      action: Allow
+    - syscall: execve
+      action: Allow
+    - syscall: fork
+      action: Allow
+    - syscall: clone
+      action: Allow
+    - syscall: wait4
+      action: Allow
+    - syscall: waitpid
+      action: Allow
+    - syscall: exit
+      action: Allow
+    - syscall: exit_group
+      action: Allow
+    - syscall: pipe
+      action: Allow
+    - syscall: dup2
+      action: Allow
+    - syscall: getpid
+      action: Allow
+    - syscall: getppid
+      action: Allow
+    - syscall: getuid
+      action: Allow
+    - syscall: getgid
+      action: Allow
+    - syscall: rt_sigaction
+      action: Allow
+    - syscall: rt_sigprocmask
+      action: Allow
+    - syscall: brk
+      action: Allow
+    - syscall: mmap
+      action: Allow
+    - syscall: munmap
+      action: Allow
+    - syscall: mprotect
+      action: Allow
+    action: Block
+---
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-network-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+  network:
+    matchProtocols:
+    - protocol: tcp
+      fromSource:
+      - matchLabels:
+          app: wisecow-service
+      action: Allow
+    - protocol: tcp
+      fromSource:
+      - matchLabels:
+          app: ingress-nginx
+      action: Allow
+    - protocol: tcp
+      toSource:
+      - matchLabels: {}
+      action: Allow
+    - protocol: udp
+      action: Allow
+    - protocol: icmp
+      action: Allow
+    action: Block
+---
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-file-integrity-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+  file:
+    matchPaths:
+    - path: /app/wisecow.sh
+      action: Audit
+    - path: /etc/passwd
+      action: Audit
+    - path: /etc/shadow
+      action: Block
+    - path: /etc/sudoers
+      action: Block
+    - path: /root/.ssh/
+      action: Block
+    - path: /home/*/.ssh/
+      action: Block
+    matchDirectories:
+    - dir: /etc/
+      recursive: false
+      action: Audit
+    - dir: /bin/
+      recursive: true
+      action: Audit
+    - dir: /usr/bin/
+      recursive: true
+      action: Audit
+    - dir: /sbin/
+      recursive: true
+      action: Audit
+    - dir: /usr/sbin/
+      recursive: true
+      action: Audit
+    action: Allow
+---
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-process-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+  process:
+    matchPaths:
+    - path: /bin/su
+      action: Block
+    - path: /usr/bin/sudo
+      action: Block
+    - path: /bin/mount
+      action: Block
+    - path: /usr/bin/wget
+      action: Block
+    - path: /usr/bin/curl
+      action: Block
+    - path: /usr/bin/ssh
+      action: Block
+    - path: /usr/bin/scp
+      action: Block
+    - path: /usr/bin/rsync
+      action: Block
+    - path: /usr/bin/docker
+      action: Block
+    - path: /usr/bin/kubectl
+      action: Block
+    - path: /bin/chmod
+      action: Audit
+    - path: /bin/chown
+      action: Audit
+    matchDirectories:
+    - dir: /usr/bin/
+      recursive: true
+      action: Audit
+    action: Allow
