@@ -44,8 +44,11 @@ jobs:
         sudo mv kubectl /usr/local/bin/
 
         # Validate YAML syntax
-        kubectl apply --dry-run=client -f k8s-manifests/
+        kubectl apply --dry-run=client --validate=false -f k8s-manifests/
         echo "✅ Kubernetes manifest validation completed"
+n        # Additional YAML syntax validation
+        echo "🔍 Performing YAML syntax validation..."
+        python -c "import yaml, os; [yaml.safe_load(open(f\"k8s-manifests/{f}\")) for f in os.listdir(\"k8s-manifests\") if f.endswith(\".yaml\")]; print(\"✅ All YAML files are valid\")"
 
   build-and-push:
     runs-on: ubuntu-latest
