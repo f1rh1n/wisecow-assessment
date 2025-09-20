@@ -9,7 +9,8 @@
       "Bash(node:*)",
       "Bash(curl:*)",
       "Bash(code .)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
