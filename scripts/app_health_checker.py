@@ -173,7 +173,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Wisecow Application Health Checker')
     parser.add_argument('--url', default=APP_URL, help='Application URL to check')
-    parser.add_argument('--interval', type=int, default=CHECK_INTERVAL, help='Check interval in seconds')
+    parser.add_argument('--interval', type=int, default=30, help='Check interval in seconds')
     parser.add_argument('--once', action='store_true', help='Run health check once and exit')
 
     args = parser.parse_args()
