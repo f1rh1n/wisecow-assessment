@@ -36,15 +36,56 @@ jobs:
         bash -n scripts/system_health_monitor.sh
         echo "✅ Script validation completed successfully"
 
-    - name: Validate YAML files
+    - name: Validate YAML syntax
       run: |
         echo "🔍 Validating YAML syntax for Kubernetes manifests..."
-        python -c "import yaml, os; [yaml.safe_load(open(f'k8s-manifests/{f}')) for f in os.listdir('k8s-manifests') if f.endswith('.yaml')]; print('✅ All YAML files are valid')"
+        python -c "
+import yaml
+import os
+manifest_dir = 'k8s-manifests'
+for filename in os.listdir(manifest_dir):
+    if filename.endswith('.yaml') or filename.endswith('.yml'):
+        filepath = os.path.join(manifest_dir, filename)
+        print(f'Checking {filename}...')
+        with open(filepath, 'r') as f:
+            yaml.safe_load(f)
+        print(f'✅ {filename} - Valid YAML')
+print('✅ All Kubernetes manifests are valid YAML')
+"
 
-    - name: Validate Kubernetes structure
+    - name: Validate Kubernetes manifest structure
       run: |
         echo "🔍 Validating Kubernetes manifest structure..."
-        python scripts/validate_k8s.py
+        python -c "
+import yaml
+import os
+
+def validate_k8s_manifest(filepath):
+    with open(filepath, 'r') as f:
+        doc = yaml.safe_load(f)
+
+    # Check required fields
+    required_fields = ['apiVersion', 'kind', 'metadata']
+    for field in required_fields:
+        if field not in doc:
+            raise ValueError(f'Missing required field: {field}')
+
+    # Check metadata has name
+    if 'name' not in doc['metadata']:
+        raise ValueError('Missing metadata.name')
+
+    return True
+
+manifest_dir = 'k8s-manifests'
+for filename in os.listdir(manifest_dir):
+    if filename.endswith('.yaml') or filename.endswith('.yml'):
+        filepath = os.path.join(manifest_dir, filename)
+        print(f'Validating {filename}...')
+        validate_k8s_manifest(filepath)
+        print(f'✅ {filename} - Valid Kubernetes manifest')
+
+print('✅ All Kubernetes manifests are structurally valid')
+"
 
   build-and-push:
     runs-on: ubuntu-latest
