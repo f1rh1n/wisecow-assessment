@@ -329,3 +329,4 @@ For issues and questions:
 - Review the deployment guide
 - Check application logs
 - Verify Kubernetes resources
+## GitHub Actions Demo
